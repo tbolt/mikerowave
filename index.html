@@ -5,22 +5,25 @@
 		<meta charset="UTF-8">
 	</head>
 	<body>
-		<h1>The Mikerowave</h1>
-		<blockquote>A microwave needs 1 button "Add 30 seconds".  pressing it should add 30 seconds and start the microwave.  If the door is opened the timer resets to 0 and you can start over.</blockquote>
-		<p>-Mike Knoll</p>
+		<div class="top-container">
+			<h1>The Mikerowave</h1>
+			<blockquote>A microwave needs 1 button "Add 30 seconds". pressing it should add 30 seconds and start the microwave.  If the door is opened the timer resets to 0 and you can start over.</blockquote>
+			<p>-Mike Knoll</p>
+		</div>
 		<div class="wrapper">
 			<div id="microwave">
-			<div id="door">
+			<div id="door" data-status="closed">
 					<div id="windowEdge"></div>
-					<div id="window"></div>
+					<div id="window" class=""></div>
 					<div id="handle"></div>
 				</div>
 				<div id="panel">
 						<div id="time">
-							<span>0:00</span>
+							<span id="counter">0:00</span>
 						</div>
 					<button id="button">
-						<span>+ :30</span>
+						<span>Add 30</span>
+						<span>Seconds</span>
 					</button>
 				</div>
 				<div id="top"></div>
@@ -43,12 +46,19 @@
 		padding-left: 10px;	
 	}	
 	
+	.top-container {
+		margin-top: 6vh;
+	}
+	
 	.wrapper {
 		display: flex;
-		height: 100%;
-		margin-top: 50px;
+		/* border: 3px solid #efefef; */
+		border-radius: 10px;
+		height: 50vh;
+		margin-top: 55px;
 		align-items: center;
 		justify-content: center;
+		cursor: url("hand.png"), auto;
 	}
 	
 	#microwave {
@@ -57,9 +67,8 @@
 		border-radius: 30px;
 		width: 450px;
 		height: 300px;
-		cursor: url("hand.png"), auto;
-
 	}
+
 	
 	#door {
 		position: relative;
@@ -94,12 +103,16 @@
 	#window {
 		border: 3px solid #444444;
 		position: absolute;
-		background-color: #ffffff;
 		background-image: url("data:image/svg+xml,%3Csvg width='20' height='12' viewBox='0 0 20 12' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 12c0-.622-.095-1.221-.27-1.785A5.982 5.982 0 0 0 10 12c1.67 0 3.182-.683 4.27-1.785A5.998 5.998 0 0 0 14 12h2a4 4 0 0 1 4-4V6c-1.67 0-3.182.683-4.27 1.785C15.905 7.22 16 6.622 16 6c0-.622-.095-1.221-.27-1.785A5.982 5.982 0 0 0 20 6V4a4 4 0 0 1-4-4h-2c0 .622.095 1.221.27 1.785A5.982 5.982 0 0 0 10 0C8.33 0 6.818.683 5.73 1.785 5.905 1.22 6 .622 6 0H4a4 4 0 0 1-4 4v2c1.67 0 3.182.683 4.27 1.785A5.998 5.998 0 0 1 4 6c0-.622.095-1.221.27-1.785A5.982 5.982 0 0 1 0 6v2a4 4 0 0 1 4 4h2zm-4 0a2 2 0 0 0-2-2v2h2zm16 0a2 2 0 0 1 2-2v2h-2zM0 2a2 2 0 0 0 2-2H0v2zm20 0a2 2 0 0 1-2-2h2v2zm-10 8a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0-2a2 2 0 1 0 0-4 2 2 0 0 0 0 4z' fill='%23888888' fill-opacity='0.75' fill-rule='evenodd'/%3E%3C/svg%3E");
 		width: 230px;
 		height: 175px;
 		left: 60px;
 		top: 62px;
+	}
+	
+	.is-running {
+		background-color: #ffffe8;
+		box-shadow: 0px 0px 5px 5px #ffffe8;	
 	}
 	
 	#panel {
@@ -113,15 +126,14 @@
 		left: 354px;
 		border-left: 6px solid #444444;
 		height: 309px;
-		padding-left: 10px;
+		padding-left: 7px;
 	}
 	
 	button {
-    color: var(--text);
-    background-color: var(--background);
+    color: #1c1d1e;
+    background-color: #afe1c3;
     font-family: inherit;
     font-size: inherit;
-    padding: 6px 15px 6px 15px;
     border: 1px solid transparent;
     border-radius: 6px;
     box-shadow: 0px 2px 2px rgba(158,158,158,.6);
@@ -138,8 +150,8 @@
 	
 	#button {
 		margin-top: 10px;
-		height: 30px;
-		font-size: 12pt;
+		height: 44px;
+		font-size: 11pt;
 		cursor: url("hand.png"), auto;
 	}
 	
@@ -149,6 +161,7 @@
 		align-items: center;
 		width: 65px;
 		height: 30px;
+		color: darkslategray;
 		border: 2px solid #888888;
 		border-radius: 3px;
 		font-size: 1.4rem;
@@ -167,7 +180,7 @@
 	}
 	
 	#right {
-	display: none;
+		display: none;
 		background-color: #444444;
 		position: absolute;
 		transform: skew(-60deg) rotate(-60deg);
@@ -194,11 +207,74 @@
 <script>
 var handle = document.getElementById("handle");
 var door = document.getElementById("door");
+var button = document.getElementById("button");
+var time = document.getElementById("counter");
+var windowGlass = document.getElementById("window");
+
+var timer = 0;
 
 handle.addEventListener("click", function () {
 	console.log("handle clicked");
-	door.classList.toggle('opened');
-})
+	
+	if (door.dataset.status == "closed") {
+		door.dataset.status = "open";
+		door.classList.add("opened");
+		stopTimer(time);
+		timer = 0;
+		windowGlass.classList.remove("is-running");
+	} else {
+		door.classList.remove("opened");
+		door.dataset.status = "closed";
+	}
+});
+
+button.addEventListener("click", function () {
+	console.log("button clicked");
+	
+	if(door.dataset.status == "closed") {
+		addTime();
+	}	
+});
+
+var addTime = function(n) {
+	
+	// prob need to debounce this and do it right
+	stopTimer(time);
+  
+	timer += 30;
+	
+	minutes = parseInt(timer / 60, 10);
+	seconds = parseInt(timer % 60, 10);
+	
+	minutes = minutes;
+	seconds = seconds < 10 ? "0" + seconds : seconds;
+	
+	time.textContent = minutes + ":" + seconds;
+	
+  setInterval(function () {
+		
+		windowGlass.classList.add("is-running");
+		
+    minutes = parseInt(timer / 60, 10);
+    seconds = parseInt(timer % 60, 10);
+
+    minutes = minutes;
+    seconds = seconds < 10 ? "0" + seconds : seconds;
+
+    time.textContent = minutes + ":" + seconds;
+    if (--timer < 0) {
+        timer = 0;
+    }
+  }, 1000);
+};
+
+function stopTimer(time) {
+	// extremely dirty hack but i mean...
+	for(i=0; i<100; i++) {
+    window.clearInterval(i);
+	}
+	time.textContent = "0:00";
+}
 </script>
 
 
